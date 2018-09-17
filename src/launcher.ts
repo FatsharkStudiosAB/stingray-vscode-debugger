@@ -23,6 +23,7 @@ export class EngineLauncher {
     private coreRootDir: string;
     private srpPath: any;
     private tcPath: string;
+    private tccPath: string;
     private engineExe: string;
 
     constructor (config: LaunchConfiguration) {
@@ -39,6 +40,7 @@ export class EngineLauncher {
             throw new Error(`Invalid ${srpPath} project path`);
 
         this.tcPath = tcPath;
+        this.tccPath = path.join(tcPath,"settings","ToolChainConfiguration.config");
         this.srpPath = srpPath;
         this.coreRootDir = tcPath;
         this.engineExe = engineExe;
@@ -63,6 +65,13 @@ export class EngineLauncher {
         } else
             this.sourceDir = srpDir;
 
+        // Read toolchain config to get source repository dir if used
+        let tccSJSON = readFile(this.tccPath, 'utf8');
+        let tcc = SJSON.parse(tccSJSON);
+
+        if (tcc.SourceRepositoryPath != "null") {
+            this.coreRootDir = tcc.SourceRepositoryPath;
+        }
         // Add platform to data dir, default to `win32` for now.
         this.dataDir = path.join(this.dataDir, 'win32');
 
@@ -83,7 +92,10 @@ export class EngineLauncher {
                 "--source-dir", `"${this.sourceDir}"`,
                 "--map-source-dir", "core", `"${this.coreRootDir}"`,
                 "--data-dir", `"${this.dataDir}"`,
-                "--port 14999"
+                "--enable-remote-cache" ,
+                "--enable-remote-cache-shaders" ,
+                "--enable-console-log",
+                "--port 14999",
             ];
 
             // Find resource maps under the TCC.

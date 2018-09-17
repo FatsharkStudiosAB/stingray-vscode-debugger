@@ -11,6 +11,7 @@ import {
 import {DebugProtocol} from 'vscode-debugprotocol';
 import _ = require('lodash');
 import {readFileSync, existsSync as fileExists} from 'fs';
+import SJSON = require('simplified-json');
 import * as fs from 'fs';
 import * as path from 'path';
 import {ConsoleConnection} from './console-connection';
@@ -225,6 +226,22 @@ class StingrayDebugSession extends DebugSession {
     }
 
     /**
+     * Establish a connection with the engine.
+     */
+    protected connectToEngineRetry(ip: string, port: number, response: DebugProtocol.Response): ConsoleConnection {
+        //throw new Error(`Idiot`);
+        this._conn = new ConsoleConnection(ip, port);
+
+        // Bind connection callbacks
+        this._conn.onOpen(this.onEngineConnectionOpened.bind(this, response));
+        this._conn.onError(() => {
+            this._conn = this.connectToEngineRetry(ip, port, response);
+        })
+
+        return this._conn;
+    }
+
+    /**
      * Launch the engine and then attach to it.
      */
     protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
@@ -254,13 +271,28 @@ class StingrayDebugSession extends DebugSession {
             this._projectFolderMaps["<project>"] = path.dirname(projectFilePath);
 
             // Add some map folder sources:
+
             let coreMapFolder = path.join(toolchainPath, 'core');
+
+            // Read toolchain config to get source repository dir if used
+            let tccPath = path.join(toolchainPath,"settings","ToolChainConfiguration.config");
+
+            let tccSJSON = readFileSync(tccPath, 'utf8');
+            let tcc = SJSON.parse(tccSJSON);
+
+            if (tcc.SourceRepositoryPath != "null") {
+                coreMapFolder = tcc.SourceRepositoryPath;
+            }
+
+            coreMapFolder = coreMapFolder.replace(/^[\/\\]|[\/\\]$/g, '');
+
             if (fileExists(coreMapFolder))
-                this._projectFolderMaps["core"] = path.dirname(coreMapFolder);
+                this._projectFolderMaps["core"] = path.dirname(coreMapFolder)
 
             // Wait for engine to start successfully, hopefully one second should be enough.
             // TODO: Try connection multiple time until timeout.
-            setTimeout(() => this.connectToEngine(engineProcess.ip, engineProcess.port, response), 1000);
+
+            this.connectToEngineRetry(engineProcess.ip, engineProcess.port, response);
         }).catch(err => {
             return this.sendErrorResponse(response, 3001, "Failed to launch engine. "+ (err.message || err));
         });

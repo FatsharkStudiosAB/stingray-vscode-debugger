@@ -1,22 +1,21 @@
 {
-    "name": "stingray-debug",
-    "displayName": "Autodesk Interactive Debugger",
+    "name": "fatshark-debug",
+    "displayName": "Fatshark Debugger",
     "version": "2.0.0",
-    "description": "Extension to debug Autodesk Interactive applications and games.",
+    "description": "Extension to debug Fatshark applications and games.",
     "license": "MIT",
     "author": {
-        "url": "https://github.com/jschmidt42",
-        "name": "Jonathan Schmidt",
-        "email": "jschmidt42@gmail.com"
+        "url": "http://www.fatshark.se",
+        "name": "Fatshark",
+        "email": "contact@fatshark.se"
     },
     "keywords": [
-        "autodesk",
-        "interactive",
+        "fatshark",
         "stingray",
         "debugger",
         "lua"
     ],
-    "publisher": "jschmidt42",
+    "publisher": "Fatshark",
     "engines": {
         "vscode": "^1.1.5",
         "node": "^6.5.0"
@@ -26,10 +25,6 @@
         "Debuggers",
         "Languages"
     ],
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/jschmidt42/stingray-vscode-debugger.git"
-    },
     "dependencies": {
         "lodash": "^4.17.4",
         "simplified-json": "^0.2.0",
