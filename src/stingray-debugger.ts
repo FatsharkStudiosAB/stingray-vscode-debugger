@@ -283,8 +283,7 @@ class StingrayDebugSession extends DebugSession {
                 this._projectFolderMaps["core"] = path.dirname(coreMapFolder)
 
             // Get project data dir to init id lookup.
-            let srpDir = path.dirname(projectFilePath);
-            this.initIdString(srpDir);
+            this.initIdString(projectFilePath);
 
             this.connectToEngineRetry(engineProcess.ip, engineProcess.port, response);
         }).catch(err => {
@@ -785,13 +784,22 @@ class StingrayDebugSession extends DebugSession {
     }
 
     private initIdString(projectPath : string): void {
-        if (!fs.existsSync(projectPath) || fs.exists(path.join(projectPath, '.stingray_project'))) {
-            throw new Error("Project path doesn't exists or is invalid");
-        }
+        // Read project settings to get data dir
+        let srpSJSON = readFileSync(projectPath, 'utf8');
+        let srp = SJSON.parse(srpSJSON);
+        let projectDataPath = ""
+        // Get project data dir.
+        let srpDir = path.dirname(projectPath);
+        let srpDirName = path.basename(srpDir);
+        if (srp.data_directory) {
+            if (fileExists(srp.data_directory))
+                projectDataPath = path.resolve(srp.data_directory);
+            else
+                projectDataPath = path.join(srpDir, srp.data_directory);
+        } else
+            projectDataPath = path.join(srpDir, "..", srpDirName + "_data");
 
-        let projectName = path.basename(projectPath);
-        let projectRoot = path.dirname(projectPath);
-        let projectDataPath = path.join(projectRoot, projectName + '_data');
+
         if (!fs.existsSync(projectDataPath)) {
             throw new Error('Cannot find project data path:' + projectDataPath);
         }
