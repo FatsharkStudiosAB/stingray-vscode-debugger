@@ -161,7 +161,7 @@ class StingrayDebugSession extends DebugSession {
     // Pending promises for requests on the debugger
     private _requests: Map<number, any> = new Map<number, any>();
 
-    private _idStringSupport : boolean = false;
+    private _idStringSupport : boolean = true;
 
     private _idStringMap : object;
 
@@ -176,11 +176,6 @@ class StingrayDebugSession extends DebugSession {
         this.setDebuggerLinesStartAt1(true);
         this.setDebuggerColumnsStartAt1(true);
 
-        /*
-        // Where is the good place to init this? And where to get the project path?
-        let dummyPath = 'D:\\Auto\\Projects\\Workflows\\Character_project4\\Character_project4';
-        this.initIdString(dummyPath);
-        */
     }
 
     /**
@@ -271,26 +266,25 @@ class StingrayDebugSession extends DebugSession {
             this._projectFolderMaps["<project>"] = path.dirname(projectFilePath);
 
             // Add some map folder sources:
-
             let coreMapFolder = path.join(toolchainPath, 'core');
 
             // Read toolchain config to get source repository dir if used
             let tccPath = path.join(toolchainPath,"settings","ToolChainConfiguration.config");
-
             let tccSJSON = readFileSync(tccPath, 'utf8');
             let tcc = SJSON.parse(tccSJSON);
 
+            // If SourceRepositoryPath is in the toolchain config use this for core folder instead of default toolchain
             if (tcc.SourceRepositoryPath != "null") {
                 coreMapFolder = tcc.SourceRepositoryPath;
             }
-
             coreMapFolder = coreMapFolder.replace(/^[\/\\]|[\/\\]$/g, '');
 
             if (fileExists(coreMapFolder))
                 this._projectFolderMaps["core"] = path.dirname(coreMapFolder)
 
-            // Wait for engine to start successfully, hopefully one second should be enough.
-            // TODO: Try connection multiple time until timeout.
+            // Get project data dir to init id lookup.
+            let srpDir = path.dirname(projectFilePath);
+            this.initIdString(srpDir);
 
             this.connectToEngineRetry(engineProcess.ip, engineProcess.port, response);
         }).catch(err => {
@@ -462,7 +456,7 @@ class StingrayDebugSession extends DebugSession {
         const scopes = new Array<Scope>();
         const scopeDescs = {
             local: 'Local',
-            up_values: 'Closure'
+            up_values: 'Closure',
         }
 
         _.each(scopeDescs, (scopeDisplayName, scopeId) => {
@@ -826,6 +820,17 @@ class StingrayDebugSession extends DebugSession {
         return str || `<unknwown> - ${idString}`;
     }
 
+    private translateVariableIdSring(variableValue: string) : string {
+        let value = variableValue;
+        if (this._idStringMap) {
+            let id_tag = value.match(/\'([^)]+)\'/)[1];
+            let id_string = id_tag.match(/\[([^)]+)\]/)[1];
+            let id_lookup = this._idStringMap[id_string];
+            value = value.replace(id_tag, id_lookup);
+        }
+        return value;
+    }
+
     /**
      * Evaluate a Lua snippet and send its result in a response.
      * @param response
@@ -875,6 +880,7 @@ class StingrayDebugSession extends DebugSession {
                 return this.evaluateIdentifier(expression).then(variable => {
                     if (!variable) {
                         // throw new Error('Cannot resolve table ' + expression);
+
                         response.body = {
                             result: result.identifier_value,
                             type: result.identifier_type,
@@ -894,9 +900,17 @@ class StingrayDebugSession extends DebugSession {
                 });
             }
 
+            let _ri_value = result.identifier_value;
+            if (result.identifier_type === 'userdata') {
+                if (_ri_value.includes("#ID"))
+                {
+                    _ri_value = this.translateVariableIdSring(_ri_value);
+                }
+            }
+
             // Immediate Value
             response.body = {
-                result: result.identifier_value,
+                result: _ri_value,
                 type: result.identifier_type,
                 variablesReference: 0
             };
@@ -1015,7 +1029,22 @@ class StingrayDebugSession extends DebugSession {
                     variablesReference: tableScopeContent.variablesReference,
                     tableIndex: i
                 });
-            } else {
+
+            } else if (tableValue.type === 'userdata') {
+                let _value = tableValue.value;
+                if (_value.includes("#ID"))
+                {
+                    _value = this.translateVariableIdSring(_value);
+                }
+
+                variables.push({
+                    name: varName,
+                    type: type,
+                    value: _value,
+                    variablesReference: 0,
+                    tableIndex: i
+                });
+            }else {
                 variables.push({
                     name: varName,
                     type: type,
