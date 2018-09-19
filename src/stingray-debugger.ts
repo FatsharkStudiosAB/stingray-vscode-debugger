@@ -221,15 +221,31 @@ class StingrayDebugSession extends DebugSession {
     }
 
     /**
+     * Establish a connection with the engine compiler.
+     */
+    protected connectToCompilerRetry(ip: string, port: number, response: DebugProtocol.Response):void {
+        this._conn = new ConsoleConnection(ip, port);
+
+        // Bind connection callbacks
+        this._conn.onOpen(this.sendEvent.bind(this, new OutputEvent(`Connected\n`)))
+        this._conn.onMessage(this.onEngineMessageReceived.bind(this))
+        this._conn.onError((err) => {
+            this.sendEvent(new OutputEvent(`Error: ${err}\n`));
+            this._conn.close();
+            this.connectToCompilerRetry(ip, port, response);
+        })
+    }
+
+    /**
      * Establish a connection with the engine.
      */
     protected connectToEngineRetry(ip: string, port: number, response: DebugProtocol.Response): ConsoleConnection {
-        //throw new Error(`Idiot`);
         this._conn = new ConsoleConnection(ip, port);
 
         // Bind connection callbacks
         this._conn.onOpen(this.onEngineConnectionOpened.bind(this, response));
         this._conn.onError(() => {
+            this._conn.close();
             this._conn = this.connectToEngineRetry(ip, port, response);
         })
 
@@ -253,10 +269,10 @@ class StingrayDebugSession extends DebugSession {
         });
         if (args.compile) {
             this.sendEvent(new OutputEvent(`Compiling data...\r\n`));
-            setTimeout(() => {
-                let compilerConnection = new ConsoleConnection("127.0.0.1", 14999);
-                compilerConnection.onMessage(this.onEngineMessageReceived.bind(this));
-            }, 1000);
+
+            this.connectToCompilerRetry("127.0.0.1", 14031, response);
+
+
         }
         launcher.start(args.compile).then(engineProcess => {
             // Tell the user what we are launching.
@@ -284,7 +300,6 @@ class StingrayDebugSession extends DebugSession {
 
             // Get project data dir to init id lookup.
             this.initIdString(projectFilePath);
-
             this.connectToEngineRetry(engineProcess.ip, engineProcess.port, response);
         }).catch(err => {
             return this.sendErrorResponse(response, 3001, "Failed to launch engine. "+ (err.message || err));

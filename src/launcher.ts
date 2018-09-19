@@ -95,7 +95,7 @@ export class EngineLauncher {
                 "--enable-remote-cache" ,
                 "--enable-remote-cache-shaders" ,
                 "--enable-console-log",
-                "--port 14999",
+                "--wait 10" // Wait for websocket connection before proceeding to not miss console output
             ];
 
             // Find resource maps under the TCC.
@@ -114,7 +114,7 @@ export class EngineLauncher {
                 "--source-dir", `"${this.sourceDir}"`,
                 "--map-source-dir", "core", `"${this.coreRootDir}"`,
                 "--data-dir", `"${this.dataDir}"`,
-                "--wait-for-debugger"
+                "--wait 10" // Wait for websocket connection before proceeding to not miss console output
             ];
             engineArgs = engineArgs.concat(this.additionalCommandLineArgs);
             engineProcess.start(engineArgs, DEFAULT_ENGINE_CONSOLE_PORT);
