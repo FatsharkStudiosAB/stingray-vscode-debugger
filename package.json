@@ -1,13 +1,17 @@
 {
     "name": "fatshark-debug",
     "displayName": "Fatshark Debugger",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "description": "Extension to debug Fatshark applications and games.",
     "license": "MIT",
     "author": {
         "url": "http://www.fatshark.se",
         "name": "Fatshark",
         "email": "contact@fatshark.se"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/FatsharkStudiosAB/stingray-vscode-debugger.git"
     },
     "keywords": [
         "fatshark",
