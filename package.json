@@ -1,7 +1,7 @@
 {
     "name": "fatshark-debug",
     "displayName": "Fatshark Debugger",
-    "version": "2.0.0",
+    "version": "1.0.0",
     "description": "Extension to debug Fatshark applications and games.",
     "license": "MIT",
     "author": {
@@ -175,23 +175,34 @@
                         }
                     },
                     {
-                        "label": "Stingray: Editor Engine (14030)",
+                        "label": "Stingray: Editor Engine (14000)",
                         "description": "A new configuration for debugging the Stingray editor's internal engine.",
                         "body": {
                             "type": "stingray",
                             "request": "attach",
                             "name": "${2:Stingray Editor}",
                             "ip": "127.0.0.1",
-                            "port": 14030
+                            "port": 14000
                         }
                     },
                     {
-                        "label": "Stingray: Asset Server (14032)",
-                        "description": "A new configuration for debugging the Stingray engine running as an asset server.",
+                        "label": "Stingray: Compile (14031)",
+                        "description": "A new configuration for debugging the Stingray engine running with the --compile flag.",
                         "body": {
                             "type": "stingray",
                             "request": "attach",
-                            "name": "${2:Stingray Asset Server}",
+                            "name": "${2:Stingray Compile}",
+                            "ip": "127.0.0.1",
+                            "port": 14031
+                        }
+                    },
+                    {
+                        "label": "Stingray: Compile Server (14032)",
+                        "description": "A new configuration for debugging the Stingray engine running as a compile server.",
+                        "body": {
+                            "type": "stingray",
+                            "request": "attach",
+                            "name": "${2:Stingray Compile Server}",
                             "ip": "127.0.0.1",
                             "port": 14032
                         }
@@ -224,10 +235,6 @@
                                 "type": "array",
                                 "description": "Optional command line arguments passed to the engine."
                             },
-                            "additional_plugins": {
-                                "type": "array",
-                                "description": "Full paths of folder to scan for additional plugins."
-                            }
                         }
                     },
                     "attach": {

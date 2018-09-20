@@ -1,37 +1,20 @@
-# Autodesk Interactive Debugger
-
-Use the [Visual Studio Code](https://code.visualstudio.com) editor and debugger with your [Autodesk® Interactive](https://forge.autodesk.com/categories/arvr) projects!
-
-Find the extension [here, in the Visual Studio Code marketplace](https://marketplace.visualstudio.com/items?itemName=jschmidt42.stingray-debug).
-
-## 1.5 (New features and bug fixes)
-
-* Add plugin resource extensions support.
-* Add additional command line arguments support.
+# Fatshark Stingray Debugger
 
 ## Description
 
-This extension makes Visual Studio Code into a full-featured code editing debugging environment for your Autodesk Interactive projects. You can connect the debugger to a running engine, launch a project, trigger breakpoints and step through your project's Lua code, view variable values, send commands to the engine, and more.
-
-If you haven't heard about Autodesk Interactive yet, check out the following links:
-
-- [The main Autodesk Interactive site at www.autodesk.com](https://www.autodesk.com/products/stingray/overview), where you can download a trial version.
-- [The Autodesk Interactive Learning Center](http://help.autodesk.com/view/Stingray/ENU/), where you can find help, tutorials, and reference docs.
-- [The Autodesk Interactive SDK Help](http://help.autodesk.com/view/Stingray/ENU/?guid=__sdk_help_introduction_html), useful if you want to write your own plug-in to extend Autodesk Interactive.
+This extension makes Visual Studio Code into a full-featured code editing debugging environment for your Fatshark projects. You can connect the debugger to a running engine, launch a project, trigger breakpoints and step through your project's Lua code, view variable values, send commands to the engine, and more.
 
 ## Step 1. Install the extension
 
 Bring up the Extensions view by clicking the Extensions icon in the Activity Bar on the left side of Visual Studio Code, or selecting **View > Extensions** (`Ctrl+Shift+X`) from the main menu.
 
-Search for `Autodesk Interactive Debugger`. You should find something like this:
-
-![image](https://cloud.githubusercontent.com/assets/4054655/24268552/7b89627a-0fe4-11e7-83e8-f170e0aebfd9.png)
+Search for `Fatshark Debugger`.
 
 For more about installing extensions, see the [Visual Studio Code user guide](https://code.visualstudio.com/docs/editor/extension-gallery).
 
 ## Step 2. Open your project folder
 
-Open your Autodesk Interactive project folder in Visual Studio Code. This will be your workspace, where Visual Studio Code will keep your debug configurations.
+Open your Fatshark project folder in Visual Studio Code. This will be your workspace, where Visual Studio Code will keep your debug configurations.
 
 Select **File > Open Folder** (`Ctrl+K Ctrl+O`) from the main menu, and browse to the folder that contains your project's *.stingray_project* file.
 
@@ -82,7 +65,7 @@ The `port` setting to use depends on how you've launched the engine:
 
 	**Tip:** to specify a port when you use the editor's Run Project feature, add the `--port <number>` command-line parameter to the default `localhost` connection listed in the **Connections** panel of the Autodesk Interactive editor.
 
--	You can also connect to the instance engine that the editor runs internally. This can be useful in order to debug the Lua code in the `core/editor_slave` folder, which provides viewport behaviors for the editor. In this case, use port `14030`.
+-	You can also connect to the instance engine that the editor runs internally. This can be useful in order to debug the Lua code in the `core/editor_slave` folder, which provides viewport behaviors for the editor. 
 
 -	For engines running on most non-Windows platforms, use `14030`. For Xbox 360, use `4601`.
 
@@ -92,7 +75,6 @@ You can make the Visual Studio Code debugger launch the Autodesk Interactive eng
 
 Launching the game from the debugger like this makes it easy to trigger breakpoints in your initialization code:
 
-![launch and break](https://cloud.githubusercontent.com/assets/4054655/24307901/5681ec96-109c-11e7-9bfa-6a2f9b962522.gif)
 
 To set this up, use a launch configuration like this:
 
@@ -112,12 +94,6 @@ To set this up, use a launch configuration like this:
 	// Full path to the project you want to launch for debugging.
 	"project_file": "D:/pitchcrawl/pitchcrawl.stingray_project",
 
-	// List of additional plugins root paths used for compilation (i.e. resource maps) and debugging runtime.
-	// All toolchain plugins are automatically included.
-	"additional_plugins": [
-		"D:/stingray_html5"
-	],
-
 	// Recompile any modified resources in the project before launching.
 	"compile":true
 
@@ -131,7 +107,7 @@ To set this up, use a launch configuration like this:
 }
 ```
 
-You don't have to provide any command-line parameters. The debugger extension will set the ones it needs, like `--port` and `--data-dir`. But you can add your own if you want to customize something about the way the engine starts up. For the complete list of command-line arguments the engine accepts, see [the Autodesk Interactive Help](http://help.autodesk.com/view/Stingray/ENU/?guid=__stingray_help_reference_engine_command_line_html).
+You don't have to provide any command-line parameters. The debugger extension will set the ones it needs, like `--port` and `--data-dir`. But you can add your own if you want to customize something about the way the engine starts up. 
 
 ## Step 5. Start debugging!
 
@@ -181,8 +157,6 @@ You can send console commands to the engine from the **Debug Console**. Prefix t
 
 You can also send commands from the **Command Palette**. Open the Command Palette, type `Stingray Command` and hit `Enter`. Then, enter the command you want to send (without the `--` prefix).
 
-For a list of all available console commands and their parameters, see [the Autodesk Interactive help](http://help.autodesk.com/view/Stingray/ENU/?guid=__stingray_help_reference_console_commands_html).
-
 ### Send engine scripts
 
 Everything that you type in the **Debug Console** that is *not* prefixed with `--` will be sent to the engine as a Lua script. The engine will evaluate this script in its Lua environment and print the return value.
@@ -199,7 +173,7 @@ Hover over any function from the Autodesk Interactive API to get the function's 
 
 ![hovering](images/hovering.png)
 
-### Autodesk Interactive Lua API function signatures
+### Stingray Lua API function signatures
 
 You'll also be reminded of the signature and description as you type the opening bracket for a function:
 
@@ -207,13 +181,7 @@ You'll also be reminded of the signature and description as you type the opening
 
 ### Syntax highlighting for SJSON resources
 
-The code editor shows appropriate syntax highlighting for Autodesk Interactive resource types that use [SJSON format](http://help.autodesk.com/view/Stingray/ENU/?guid=__stingray_help_managing_content_sjson_html), like *.unit*, *.level*, and *.script_flow_nodes*.
+The code editor shows appropriate syntax highlighting for Autodesk Interactive resource types that use [SJSON format], like *.unit*, *.level*, and *.script_flow_nodes*.
 
 ![SJSON highlighting](images/sjson.png)
 
-## Feedback and contributions welcome!
-
-If you tried out this extension, why not leave us a note on its [marketplace home page](https://marketplace.visualstudio.com/items?itemName=jschmidt42.stingray-debug)?
- We'd love to hear feedback about your experience, and any suggestions you have for things we could improve or add.
-
-If you'd like to get involved in adding more features, come on over to our [GitHub repository](https://github.com/jschmidt42/stingray-vscode-debugger). You can use the Issues tab to start a discussion, or jump right in and make your own fork.
