@@ -4,6 +4,8 @@
 
 This extension makes Visual Studio Code into a full-featured code editing debugging environment for your Fatshark projects. You can connect the debugger to a running engine, launch a project, trigger breakpoints and step through your project's Lua code, view variable values, send commands to the engine, and more.
 
+This extension is based on a fork of the [Autodesk Interactive Debugger](https://marketplace.visualstudio.com/items?itemName=jschmidt42.stingray-debug) developed by Jonathan Schmidt.
+
 ## Step 1. Install the extension
 
 Bring up the Extensions view by clicking the Extensions icon in the Activity Bar on the left side of Visual Studio Code, or selecting **View > Extensions** (`Ctrl+Shift+X`) from the main menu.

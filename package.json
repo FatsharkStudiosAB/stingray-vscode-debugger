@@ -168,10 +168,10 @@
                             "request": "launch",
                             "name": "${1:My application name}",
                             "toolchain": "C:/path/to/stingray/binaries/installation",
-                            "engine_exe": "interactive_win64_dev.exe",
+                            "engine_exe": "stingray_win64_dev_x64.exe",
                             "project_file": "^\"\\${workspaceRoot}/project.stingray_project\"",
                             "compile": true,
-                            "additional_plugins": []
+                            "command_line_args": []
                         }
                     },
                     {
@@ -221,7 +221,7 @@
                             },
                             "engine_exe": {
                                 "type": "string",
-                                "description": "Stingray executable name. e.g. stingray_win64_dev.exe"
+                                "description": "Stingray executable name. e.g. stingray_win64_dev_x64.exe"
                             },
                             "project_file": {
                                 "type": "string",
@@ -234,7 +234,7 @@
                             "command_line_args": {
                                 "type": "array",
                                 "description": "Optional command line arguments passed to the engine."
-                            },
+                            }
                         }
                     },
                     "attach": {
