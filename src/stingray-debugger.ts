@@ -470,7 +470,7 @@ class StingrayDebugSession extends DebugSession {
         const scopes = new Array<Scope>();
         const scopeDescs = {
             local: 'Local',
-            up_values: 'Closure',
+            up_values: 'Up Values',
         }
 
         _.each(scopeDescs, (scopeDisplayName, scopeId) => {
