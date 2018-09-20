@@ -1,13 +1,13 @@
 {
     "name": "fatshark-debug",
     "displayName": "Fatshark Debugger",
-    "version": "2.0.0",
+    "version": "1.0.0",
     "description": "Extension to debug Fatshark applications and games.",
     "license": "MIT",
     "author": {
         "url": "http://www.fatshark.se",
         "name": "Fatshark",
-        "email": "contact@fatshark.se"
+        "email": "tools@fatshark.se"
     },
     "repository": {
         "type": "git",
@@ -21,8 +21,8 @@
     ],
     "publisher": "Fatshark",
     "engines": {
-        "vscode": "^1.1.5",
-        "node": "^6.5.0"
+        "vscode": "^1.18.0",
+        "node": "^7.9.0"
     },
     "icon": "images/icon.png",
     "categories": [
@@ -30,22 +30,24 @@
         "Languages"
     ],
     "dependencies": {
-        "lodash": "^4.17.4",
-        "simplified-json": "^0.2.0",
-        "vscode-debugprotocol": "^1.19.0",
-        "vscode-debugadapter": "^1.19.0",
-        "ws": "^2.2.2"
+        "await-notify": "1.0.1",
+        "lodash": "^4.17.11",
+        "simplified-json": "^0.3.0",
+        "vscode-debugadapter": "1.24.0",
+        "vscode-debugprotocol": "1.24.0",
+        "ws": "^6.0.0"
     },
     "devDependencies": {
         "@types/es6-collections": "^0.5.29",
         "@types/es6-promise": "^0.0.32",
-        "@types/mocha": "^2.2.33",
-        "@types/node": "^6.0.50",
-        "mocha": "^3.1.2",
-        "tslint": "^5.7.0",
-        "typescript": "^2.5.1",
-        "vscode": "^1.1.5",
-        "vscode-debugadapter-testsupport": "^1.19.0"
+        "@types/mocha": "2.2.48",
+        "@types/node": "7.0.55",
+        "mocha": "5.0.1",
+        "tslint": "5.9.1",
+        "typescript": "2.6.2",
+        "vsce": "1.37.5",
+        "vscode": "^1.1.21",
+        "vscode-debugadapter-testsupport": "1.27.0"
     },
     "scripts": {
         "prepublish": "node ./node_modules/typescript/bin/tsc -p ./src",
