@@ -230,7 +230,7 @@ class StingrayDebugSession extends DebugSession {
         this._conn.onOpen(this.sendEvent.bind(this, new OutputEvent(`Connected\n`)))
         this._conn.onMessage(this.onEngineMessageReceived.bind(this))
         this._conn.onError((err) => {
-            this.sendEvent(new OutputEvent(`Retrying Connection`));
+            this.sendEvent(new OutputEvent(`Retrying Connection...\n`));
             this._conn.close();
             this.connectToCompilerRetry(ip, port, response);
         })
