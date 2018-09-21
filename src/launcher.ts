@@ -69,7 +69,7 @@ export class EngineLauncher {
         let tccSJSON = readFile(this.tccPath, 'utf8');
         let tcc = SJSON.parse(tccSJSON);
 
-        if (tcc.SourceRepositoryPath != "null") {
+        if (tcc.SourceRepositoryPath != null) {
             this.coreRootDir = tcc.SourceRepositoryPath;
         }
         // Add platform to data dir, default to `win32` for now.

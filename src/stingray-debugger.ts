@@ -230,7 +230,7 @@ class StingrayDebugSession extends DebugSession {
         this._conn.onOpen(this.sendEvent.bind(this, new OutputEvent(`Connected\n`)))
         this._conn.onMessage(this.onEngineMessageReceived.bind(this))
         this._conn.onError((err) => {
-            this.sendEvent(new OutputEvent(`Error: ${err}\n`));
+            this.sendEvent(new OutputEvent(`Retrying Connection`));
             this._conn.close();
             this.connectToCompilerRetry(ip, port, response);
         })
@@ -268,7 +268,7 @@ class StingrayDebugSession extends DebugSession {
             commandLineArgs: args.command_line_args || []
         });
         if (args.compile) {
-            this.sendEvent(new OutputEvent(`Compiling data...\r\n`));
+            this.sendEvent(new OutputEvent(`Launching Compiler...\r\n`));
 
             this.connectToCompilerRetry("127.0.0.1", 14031, response);
 
@@ -290,7 +290,7 @@ class StingrayDebugSession extends DebugSession {
             let tcc = SJSON.parse(tccSJSON);
 
             // If SourceRepositoryPath is in the toolchain config use this for core folder instead of default toolchain
-            if (tcc.SourceRepositoryPath != "null") {
+            if (tcc.SourceRepositoryPath != null) {
                 coreMapFolder = tcc.SourceRepositoryPath;
             }
             coreMapFolder = coreMapFolder.replace(/^[\/\\]|[\/\\]$/g, '');

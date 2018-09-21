@@ -223,7 +223,7 @@
                         "properties": {
                             "toolchain": {
                                 "type": "string",
-                                "description": "Stingray installation folder. e.g. C:/Program Files/Autodesk/Stingray/1.8.1267.0"
+                                "description": "Stingray installation folder. e.g. C:/path/to/toolchain"
                             },
                             "engine_exe": {
                                 "type": "string",
