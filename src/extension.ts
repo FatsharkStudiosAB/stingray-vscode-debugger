@@ -7,7 +7,6 @@
 import * as vscode from 'vscode';
 import * as commands from './commands';
 import * as autocomplete from './autocomplete'
-import * as fs from 'fs';
 
 const initialConfigurations = {
     version: '0.2.0',

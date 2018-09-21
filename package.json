@@ -74,8 +74,8 @@
             "properties": {
                 "stingray.toolchain": {
                     "type": "string",
-                    "default": "${env.SR_BIN_DIR}",
-                    "description": "Stingray installation folder. e.g. C:/Program Files/Autodesk/Stingray/1.8.1267.0"
+                    "default": "${env.BsBinariesDir}",
+                    "description": "Fatshark toolchain sync folder, e.g. C:/BitsquidBinaries/"
                 }
             }
         },
@@ -173,9 +173,8 @@
                             "type": "stingray",
                             "request": "launch",
                             "name": "${1:My application name}",
-                            "toolchain": "C:/path/to/stingray/binaries/installation",
+                            "toolchain": "Project",
                             "engine_exe": "stingray_win64_dev_x64.exe",
-                            "project_file": "^\"\\${workspaceRoot}/project.stingray_project\"",
                             "compile": true,
                             "command_line_args": []
                         }
@@ -188,7 +187,8 @@
                             "request": "attach",
                             "name": "${2:Stingray Editor}",
                             "ip": "127.0.0.1",
-                            "port": 14000
+                            "port": 14000,
+                            "toolchain": "Project"
                         }
                     },
                     {
@@ -199,7 +199,8 @@
                             "request": "attach",
                             "name": "${2:Stingray Compile}",
                             "ip": "127.0.0.1",
-                            "port": 14031
+                            "port": 14031,
+                            "toolchain": "Project"
                         }
                     },
                     {
@@ -210,7 +211,8 @@
                             "request": "attach",
                             "name": "${2:Stingray Compile Server}",
                             "ip": "127.0.0.1",
-                            "port": 14032
+                            "port": 14032,
+                            "toolchain": "Project"
                         }
                     }
                 ],
@@ -223,15 +225,7 @@
                         "properties": {
                             "toolchain": {
                                 "type": "string",
-                                "description": "Stingray installation folder. e.g. C:/path/to/toolchain"
-                            },
-                            "engine_exe": {
-                                "type": "string",
-                                "description": "Stingray executable name. e.g. stingray_win64_dev_x64.exe"
-                            },
-                            "project_file": {
-                                "type": "string",
-                                "description": "Path to your project's *.stingray_project* file."
+                                "description": "The name of your toolchain inside the BsBinaries path. so a project name of Project would result in a toolchain path of C:/BitsquidBinaries/Project"
                             },
                             "compile": {
                                 "type": "boolean",
@@ -246,7 +240,8 @@
                     "attach": {
                         "required": [
                             "ip",
-                            "port"
+                            "port",
+                            "toolchain"
                         ],
                         "properties": {
                             "ip": {
@@ -258,6 +253,10 @@
                                 "type": "number",
                                 "description": "Port used by the engine for console connections.",
                                 "default": 14000
+                            },
+                            "toolchain": {
+                                "type": "string",
+                                "description": "The name of your toolchain inside the BsBinaries path. so a project name of Project would result in a toolchain path of C:/BitsquidBinaries/Project"
                             }
                         }
                     }

@@ -28,18 +28,18 @@ export interface AttachRequestArguments extends DebugProtocol.LaunchRequestArgum
     ip?: string;
     /** Port of the Stingray engine process to debug, usually 14030-14039 */
     port?: number;
+    /** Stingray toolchain folder name */
+    toolchain: string;
 }
 
 /**
  * This interface should always match the schema found in the stingray-debug extension manifest.
  */
 export interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
-    /** Stingray binary folder */
+    /** Stingray toolchain folder name */
     toolchain: string;
     /** Stingray executable name */
     engine_exe: string;
-    /** Project settings file path */
-    project_file: string;
     /* Full paths of plugin folder to be scanned for additional plugins. (i.e. resource extensions). */
     additional_plugins: string[];
     /** If set, the project will be compiled before being launched. */
@@ -214,6 +214,7 @@ class StingrayDebugSession extends DebugSession {
         this._conn = new ConsoleConnection(ip, port);
 
         // Bind connection callbacks
+        this._conn.onOpen(this.sendEvent.bind(this, new OutputEvent(`Connected\n\n`)))
         this._conn.onOpen(this.onEngineConnectionOpened.bind(this, response));
         this._conn.onError(this.onEngineConnectionError.bind(this, response));
 
@@ -227,10 +228,10 @@ class StingrayDebugSession extends DebugSession {
         this._conn = new ConsoleConnection(ip, port);
 
         // Bind connection callbacks
-        this._conn.onOpen(this.sendEvent.bind(this, new OutputEvent(`Connected\n`)))
+        this._conn.onOpen(this.sendEvent.bind(this, new OutputEvent(`Connected\n\n`)))
         this._conn.onMessage(this.onEngineMessageReceived.bind(this))
         this._conn.onError((err) => {
-            this.sendEvent(new OutputEvent(`Retrying Connection...\n`));
+            this.sendEvent(new OutputEvent(`\nRetrying Connection...\n`));
             this._conn.close();
             this.connectToCompilerRetry(ip, port, response);
         })
@@ -243,6 +244,7 @@ class StingrayDebugSession extends DebugSession {
         this._conn = new ConsoleConnection(ip, port);
 
         // Bind connection callbacks
+        this._conn.onOpen(this.sendEvent.bind(this, new OutputEvent(`Connected\n\n`)))
         this._conn.onOpen(this.onEngineConnectionOpened.bind(this, response));
         this._conn.onError(() => {
             this._conn.close();
@@ -256,39 +258,44 @@ class StingrayDebugSession extends DebugSession {
      * Launch the engine and then attach to it.
      */
     protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
-        let toolchainPath = args.toolchain;
-        let projectFilePath = args.project_file;
         let engineExe = args.engine_exe;
+
+        let toolchain = args.toolchain;
+        let toolchainPath = process.env.BsBinariesDir;
+
+        if (toolchainPath == null )
+            toolchainPath = "C:/BitSquidBinaries";
+
+        toolchainPath = path.join(toolchainPath,toolchain);
+
         // Launch engine
         let launcher = new EngineLauncher({
             tcPath: toolchainPath,
             engineExe: engineExe,
-            projectPath: projectFilePath,
-            additionalPlugins: args.additional_plugins || [],
             commandLineArgs: args.command_line_args || []
         });
         if (args.compile) {
             this.sendEvent(new OutputEvent(`Launching Compiler...\r\n`));
-
             this.connectToCompilerRetry("127.0.0.1", 14031, response);
-
-
         }
         launcher.start(args.compile).then(engineProcess => {
-            // Tell the user what we are launching.
-            this.sendEvent(new OutputEvent(`Launching ${engineProcess.cmdline}...\r\n`));
+            this.sendEvent(new OutputEvent(`\nLaunching ${engineProcess.cmdline}...\r\n`));
 
-            // Set startup project root to resolve scripts.
-            this._projectFolderMaps["<project>"] = path.dirname(projectFilePath);
-
-            // Add some map folder sources:
-            let coreMapFolder = path.join(toolchainPath, 'core');
-
-            // Read toolchain config to get source repository dir if used
+            //Get current project data from the toolchain
             let tccPath = path.join(toolchainPath,"settings","ToolChainConfiguration.config");
             let tccSJSON = readFileSync(tccPath, 'utf8');
             let tcc = SJSON.parse(tccSJSON);
+            let projectIndex = tcc.ProjectIndex;
+            let projectData = tcc.Projects[projectIndex];
+            this.initIdString(projectData);
 
+            let SourceDirectory = projectData.SourceDirectory;
+
+            // Set startup project root to resolve scripts.
+            this._projectFolderMaps["<project>"] = path.dirname(SourceDirectory);
+
+            // Add some map folder sources:
+            let coreMapFolder = path.join(toolchainPath, 'core');
             // If SourceRepositoryPath is in the toolchain config use this for core folder instead of default toolchain
             if (tcc.SourceRepositoryPath != null) {
                 coreMapFolder = tcc.SourceRepositoryPath;
@@ -298,8 +305,7 @@ class StingrayDebugSession extends DebugSession {
             if (fileExists(coreMapFolder))
                 this._projectFolderMaps["core"] = path.dirname(coreMapFolder)
 
-            // Get project data dir to init id lookup.
-            this.initIdString(projectFilePath);
+
             this.connectToEngineRetry(engineProcess.ip, engineProcess.port, response);
         }).catch(err => {
             return this.sendErrorResponse(response, 3001, "Failed to launch engine. "+ (err.message || err));
@@ -312,6 +318,20 @@ class StingrayDebugSession extends DebugSession {
     protected attachRequest(response: DebugProtocol.AttachResponse, args: AttachRequestArguments): void {
         var ip = args.ip;
         var port = args.port;
+        let toolchain = args.toolchain;
+        let toolchainPath = process.env.BsBinariesDir;
+
+        if (toolchainPath == null )
+            toolchainPath = "C:/BitSquidBinaries";
+
+        toolchainPath = path.join(toolchainPath, toolchain);
+
+        let tccPath = path.join(toolchainPath,"settings","ToolChainConfiguration.config");
+        let tccSJSON = readFileSync(tccPath, 'utf8');
+        let tcc = SJSON.parse(tccSJSON);
+        let projectIndex = tcc.ProjectIndex;
+        let projectData = tcc.Projects[projectIndex];
+        this.initIdString(projectData);
 
         // Establish web socket connection with engine.
         this.connectToEngine(ip, port, response);
@@ -367,7 +387,7 @@ class StingrayDebugSession extends DebugSession {
                 break;
             }
 
-            let projectFilePath = _.first(helpers.findFiles(dirPath, '.stingray_project'));
+            let projectFilePath = _.first(helpers.findFiles(dirPath, '.ini'));
             if (projectFilePath && fileExists(projectFilePath)) {
                 resourcePath = path.relative(dirPath, filePath);
                 this._projectFolderMaps["<project>"] = dirPath;
@@ -798,22 +818,9 @@ class StingrayDebugSession extends DebugSession {
         return request.promise;
     }
 
-    private initIdString(projectPath : string): void {
-        // Read project settings to get data dir
-        let srpSJSON = readFileSync(projectPath, 'utf8');
-        let srp = SJSON.parse(srpSJSON);
-        let projectDataPath = ""
-        // Get project data dir.
-        let srpDir = path.dirname(projectPath);
-        let srpDirName = path.basename(srpDir);
-        if (srp.data_directory) {
-            if (fileExists(srp.data_directory))
-                projectDataPath = path.resolve(srp.data_directory);
-            else
-                projectDataPath = path.join(srpDir, srp.data_directory);
-        } else
-            projectDataPath = path.join(srpDir, "..", srpDirName + "_data");
+    private initIdString(projectData : any): void {
 
+        let projectDataPath = projectData.DataDirectoryBase;
 
         if (!fs.existsSync(projectDataPath)) {
             throw new Error('Cannot find project data path:' + projectDataPath);
@@ -849,7 +856,8 @@ class StingrayDebugSession extends DebugSession {
             let id_tag = value.match(/\'([^)]+)\'/)[1];
             let id_string = id_tag.match(/\[([^)]+)\]/)[1];
             let id_lookup = this._idStringMap[id_string];
-            value = value.replace(id_tag, id_lookup);
+            if (id_lookup != null)
+                value = value.replace(id_tag, id_lookup);
         }
         return value;
     }
