@@ -6,6 +6,7 @@ import {EngineProcess, DEFAULT_ENGINE_CONSOLE_PORT} from './engine-process';
 export interface LaunchConfiguration {
     tcPath: string;
     engineExe: string;
+    port: number;
     commandLineArgs?: string[];
 }
 
@@ -13,16 +14,19 @@ export class EngineLauncher {
     additionalCommandLineArgs: string[];
     private tcPath: string;
     private engineExe: string;
+    private port: number;
 
     constructor (config: LaunchConfiguration) {
         const tcPath = config.tcPath;
         const engineExe = config.engineExe || "stingray_win64_dev_x64.exe";
+        const port = config.port;
 
         if (!fileExists(tcPath))
             throw new Error(`Invalid ${tcPath} toolchain folder path`);
 
         this.tcPath = tcPath;
         this.engineExe = engineExe;
+        this.port = port;
         this.additionalCommandLineArgs = config.commandLineArgs || [];
     }
 
@@ -46,11 +50,12 @@ export class EngineLauncher {
         return compilePromise.then(() => {
             let engineArgs = [
                 "--toolchain", `"${this.tcPath}"`,
+                "--port",`"${this.port}"`,
                 "--no-compile",
                 "--wait 10" // Wait for websocket connection before proceeding to not miss console output
             ];
             engineArgs = engineArgs.concat(this.additionalCommandLineArgs);
-            engineProcess.start(engineArgs, DEFAULT_ENGINE_CONSOLE_PORT);
+            engineProcess.start(engineArgs, this.port);
             return engineProcess;
         });
     }

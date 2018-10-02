@@ -176,6 +176,7 @@
                             "name": "${1:My application name}",
                             "toolchain": "Project",
                             "engine_exe": "stingray_win64_dev_x64.exe",
+                            "port": 14000,
                             "compile": true,
                             "command_line_args": []
                         }
@@ -227,6 +228,11 @@
                             "toolchain": {
                                 "type": "string",
                                 "description": "The name of your toolchain inside the BsBinaries path. so a project name of Project would result in a toolchain path of C:/BitsquidBinaries/Project"
+                            },
+                            "port": {
+                                "type": "number",
+                                "description": "Port used by the engine for console connections",
+                                "default": 14000
                             },
                             "compile": {
                                 "type": "boolean",

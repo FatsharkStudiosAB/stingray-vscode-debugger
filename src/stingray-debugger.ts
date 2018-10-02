@@ -40,6 +40,8 @@ export interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArgum
     toolchain: string;
     /** Stingray executable name */
     engine_exe: string;
+    /** Port of the Stingray engine process to debug, usually 14030-14039 */
+    port?: number;
     /* Full paths of plugin folder to be scanned for additional plugins. (i.e. resource extensions). */
     additional_plugins: string[];
     /** If set, the project will be compiled before being launched. */
@@ -261,6 +263,7 @@ class StingrayDebugSession extends DebugSession {
         let engineExe = args.engine_exe;
 
         let toolchain = args.toolchain;
+        let engine_port = args.port;
         let toolchainPath = process.env.BsBinariesDir;
 
         if (toolchainPath == null )
@@ -272,6 +275,7 @@ class StingrayDebugSession extends DebugSession {
         let launcher = new EngineLauncher({
             tcPath: toolchainPath,
             engineExe: engineExe,
+            port: engine_port,
             commandLineArgs: args.command_line_args || []
         });
         if (args.compile) {
@@ -1109,5 +1113,4 @@ class StingrayDebugSession extends DebugSession {
         });
     }
 }
-
 DebugSession.run(StingrayDebugSession);
