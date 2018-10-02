@@ -1,4 +1,7 @@
 ## 1.1.2
+* Clear breakpoints and continue on disconnecting from an attached debug target
+
+## 1.1.2
 * Now properly runs code completion for all workspaces with .lua files
 
 ## 1.1
