@@ -342,6 +342,8 @@ class StingrayDebugSession extends DebugSession {
      * Lets close engine connection and finish session.
      */
     protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments): void {
+        this._conn.sendDebuggerCommand('set_breakpoints', {breakpoints: {}});
+        this._conn.sendDebuggerCommand('continue');
         // Close the engine connection
         this._conn.close();
         this._conn = null;

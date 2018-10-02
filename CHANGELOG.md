@@ -1,3 +1,9 @@
+## 1.1.2
+* Now properly runs code completion for all workspaces with .lua files
+
+## 1.1
+* Now works with Fatshark toolchain configuration
+
 ## 1.0
 * First version, forked from Autodesk Interactive and updated with custom project management and console connection workflows as well as translating id strings in variabls
 

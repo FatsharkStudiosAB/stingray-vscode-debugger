@@ -28,7 +28,7 @@ A *debug configuration* tells the Visual Studio Code debugger what it should do 
 
 You can read some background about these configs [here](https://code.visualstudio.com/docs/editor/debugging).
 
-You'll have to create at least one new debug configuration in order to make the debugger able to attach to or launch the Autodesk Interactive engine.
+You'll have to create at least one new debug configuration in order to make the debugger able to attach to or launch the engine.
 
 1.	Bring up the Debug view by clicking the Debug icon in the Activity Bar on the left side of Visual Studio Code, or by selecting **View > Debug** (`Ctrl+Shift+D`) from the main menu.
 
@@ -42,7 +42,7 @@ You'll have to create at least one new debug configuration in order to make the 
 
 ### Attach to a running engine
 
-You can make the Visual Studio Code debugger connect to a running instance of the Autodesk Interactive engine. Use the following launch configuration:
+You can make the Visual Studio Code debugger connect to a running instance of the Stingray engine. Use the following launch configuration:
 
 ```javascript
 {
@@ -51,7 +51,7 @@ You can make the Visual Studio Code debugger connect to a running instance of th
 	"request": "attach", // Use attach here to make the debugger connect to an existing process.
 	"name": "My Stingray Game",
 
-	// The IP address of the device running the Autodesk Interactive engine.
+	// The IP address of the device running the stingray engine.
 	"ip": "127.0.0.1",
 
 	// The port the engine is using for console communications.
@@ -65,9 +65,9 @@ The `port` setting to use depends on how you've launched the engine:
 
 -	If you launched the engine on Windows using the editor's Run Project feature, or by running a deployed project (with the `dev` configuration), the engine chooses a free port between `14000` and `14030` inclusive. This means that you might not have the same port number every time you run. To specify a pre-set port number when you launch the engine, you can use the `--port <number>` command-line parameter.
 
-	**Tip:** to specify a port when you use the editor's Run Project feature, add the `--port <number>` command-line parameter to the default `localhost` connection listed in the **Connections** panel of the Autodesk Interactive editor.
+	**Tip:** to specify a port when you use the editor's Run Project feature, add the `--port <number>` command-line parameter to the default `localhost` connection listed in the toolcenter.
 
--	You can also connect to the instance engine that the editor runs internally. This can be useful in order to debug the Lua code in the `core/editor_slave` folder, which provides viewport behaviors for the editor. 
+-	You can also connect to the instance engine that the editor runs internally. This can be useful in order to debug the Lua code in the `core/editor_slave` folder, which provides viewport behaviors for the editor.
 
 -	For engines running on most non-Windows platforms, use `14030`. For Xbox 360, use `4601`.
 
@@ -109,7 +109,7 @@ To set this up, use a launch configuration like this:
 }
 ```
 
-You don't have to provide any command-line parameters. The debugger extension will set the ones it needs, like `--port` and `--data-dir`. But you can add your own if you want to customize something about the way the engine starts up. 
+You don't have to provide any command-line parameters. The debugger extension will set the ones it needs, like `--port` and `--data-dir`. But you can add your own if you want to customize something about the way the engine starts up.
 
 ## Step 5. Start debugging!
 
