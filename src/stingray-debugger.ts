@@ -788,14 +788,8 @@ class StingrayDebugSession extends DebugSession {
     public shutdown(): void {
         this._conn.sendDebuggerCommand('set_breakpoints', {breakpoints: {}});
         this._conn.sendDebuggerCommand('continue');
-        setTimeout(() => {
-            process.exit(0);
-        }, 100);
 	}
 
-    protected customRequest(command: string, response: DebugProtocol.Response, args: any): void {
-		this.shutdown();
-	}
     //---- Implementation
 
     private getResourceFilePath (source) {

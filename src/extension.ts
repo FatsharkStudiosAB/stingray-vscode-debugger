@@ -43,7 +43,5 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-    const session = vscode.debug.activeDebugSession;
-    session.customRequest('dshsa');
 }
 
