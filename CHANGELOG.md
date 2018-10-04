@@ -1,3 +1,6 @@
+## 1.1.5
+* Script project and mapped folder directory mapping now taken from toolchain instead of relying on finding project and mapped folder specific files like .asset_server_directory etc.
+
 ## 1.1.4
 * Specifying ports for launch configs now allow users to debug multiple instances of the game at the same time
 

@@ -1,7 +1,7 @@
 {
     "name": "fatshark-debug",
     "displayName": "Fatshark Debugger",
-    "version": "1.1.4",
+    "version": "1.1.5",
     "description": "Extension to debug Fatshark applications and games.",
     "license": "MIT",
     "author": {
@@ -62,9 +62,6 @@
         "onCommand:extension.stingray-debug.run-command",
         "onCommand:extension.stingray-debug.getProgramName",
         "onCommand:extension.stingray-debug.provideInitialConfigurations",
-        "workspaceContains:.stingray_project",
-        "workspaceContains:.stingray_plugin",
-        "workspaceContains:.stingray-asset-server-directory",
         "onLanguage:lua",
         "workspaceContains:spm-packages.sjson"
     ],

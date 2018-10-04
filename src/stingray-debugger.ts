@@ -167,6 +167,12 @@ class StingrayDebugSession extends DebugSession {
 
     private _idStringMap : object;
 
+    //Project source and core dir used for lookups for debugging
+
+    private _projectMapFolder : string;
+
+    private _coreMapFolder : string;
+
     /**
      * Creates a new debug adapter that is used for one debug session.
      * We configure the default implementation of a debug adapter here.
@@ -261,11 +267,10 @@ class StingrayDebugSession extends DebugSession {
      */
     protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
         let engineExe = args.engine_exe;
-
-        let toolchain = args.toolchain;
         let engine_port = args.port;
-        let toolchainPath = process.env.BsBinariesDir;
+        let toolchain = args.toolchain;
 
+        let toolchainPath = process.env.BsBinariesDir;
         if (toolchainPath == null )
             toolchainPath = "C:/BitSquidBinaries";
 
@@ -284,32 +289,8 @@ class StingrayDebugSession extends DebugSession {
         }
         launcher.start(args.compile).then(engineProcess => {
             this.sendEvent(new OutputEvent(`\nLaunching ${engineProcess.cmdline}...\r\n`));
-
-            //Get current project data from the toolchain
-            let tccPath = path.join(toolchainPath,"settings","ToolChainConfiguration.config");
-            let tccSJSON = readFileSync(tccPath, 'utf8');
-            let tcc = SJSON.parse(tccSJSON);
-            let projectIndex = tcc.ProjectIndex;
-            let projectData = tcc.Projects[projectIndex];
-            this.initIdString(projectData);
-
-            let SourceDirectory = projectData.SourceDirectory;
-
-            // Set startup project root to resolve scripts.
-            this._projectFolderMaps["<project>"] = path.dirname(SourceDirectory);
-
-            // Add some map folder sources:
-            let coreMapFolder = path.join(toolchainPath, 'core');
-            // If SourceRepositoryPath is in the toolchain config use this for core folder instead of default toolchain
-            if (tcc.SourceRepositoryPath != null) {
-                coreMapFolder = tcc.SourceRepositoryPath;
-            }
-            coreMapFolder = coreMapFolder.replace(/^[\/\\]|[\/\\]$/g, '');
-
-            if (fileExists(coreMapFolder))
-                this._projectFolderMaps["core"] = path.dirname(coreMapFolder)
-
-
+            //Initiate project paths and id string lookup
+            this.initProjectPaths(toolchainPath);
             this.connectToEngineRetry(engineProcess.ip, engineProcess.port, response);
         }).catch(err => {
             return this.sendErrorResponse(response, 3001, "Failed to launch engine. "+ (err.message || err));
@@ -323,20 +304,14 @@ class StingrayDebugSession extends DebugSession {
         var ip = args.ip;
         var port = args.port;
         let toolchain = args.toolchain;
-        let toolchainPath = process.env.BsBinariesDir;
 
+        let toolchainPath = process.env.BsBinariesDir;
         if (toolchainPath == null )
             toolchainPath = "C:/BitSquidBinaries";
 
         toolchainPath = path.join(toolchainPath, toolchain);
-
-        let tccPath = path.join(toolchainPath,"settings","ToolChainConfiguration.config");
-        let tccSJSON = readFileSync(tccPath, 'utf8');
-        let tcc = SJSON.parse(tccSJSON);
-        let projectIndex = tcc.ProjectIndex;
-        let projectData = tcc.Projects[projectIndex];
-        this.initIdString(projectData);
-
+        //Initiate project paths and id string lookup
+        this.initProjectPaths(toolchainPath);
         // Establish web socket connection with engine.
         this.connectToEngine(ip, port, response);
     }
@@ -384,7 +359,7 @@ class StingrayDebugSession extends DebugSession {
 
         // Find resource root looking for settings.ini or .stingray-asset-server-directory
         let resourcePath = filePath;
-        let dirPath = path.dirname(filePath);
+        let dirPath = path.dirname(filePath).replace(/^[\/\\]|[\/\\]$/g, '');
         while (true) {
 
             // Check that we have a valid script folder or that we did not reach the drive root.
@@ -393,18 +368,13 @@ class StingrayDebugSession extends DebugSession {
                 break;
             }
 
-            let projectFilePath = _.first(helpers.findFiles(dirPath, '.ini'));
-            if (projectFilePath && fileExists(projectFilePath)) {
-                resourcePath = path.relative(dirPath, filePath);
-                this._projectFolderMaps["<project>"] = dirPath;
+            if (dirPath == this._projectMapFolder) {
+                resourcePath = path.relative(this._projectMapFolder, filePath);
                 break;
             }
 
-            let stingrayDirTokenFilePath = path.join(dirPath, '.stingray-asset-server-directory');
-            if (fileExists(stingrayDirTokenFilePath)) {
-                let mapName = path.basename(dirPath);
-                resourcePath = path.join(mapName, path.relative(dirPath, filePath));
-                this._projectFolderMaps[mapName] = path.dirname(dirPath);
+            if (dirPath == this._coreMapFolder) {
+                resourcePath = path.join('core', path.relative(this._coreMapFolder, filePath));
                 break;
             }
 
@@ -827,6 +797,34 @@ class StingrayDebugSession extends DebugSession {
         this._conn.sendDebuggerCommand(command, data);
 
         return request.promise;
+    }
+
+    private initProjectPaths(toolchainPath : string): void {
+
+        let tccPath = path.join(toolchainPath,"settings","ToolChainConfiguration.config");
+        let tccSJSON = readFileSync(tccPath, 'utf8');
+        let tcc = SJSON.parse(tccSJSON);
+        let projectIndex = tcc.ProjectIndex;
+        let projectData = tcc.Projects[projectIndex];
+        this._projectMapFolder = projectData.SourceDirectory.replace(/^[\/\\]|[\/\\]$/g, '');
+
+        //Init idstring lookup
+        this.initIdString(projectData);
+
+        // Set project root to resolve scripts.
+        this._projectFolderMaps["<project>"] = this._projectMapFolder;
+
+        // Add core map folder to resolve core scripts
+        let coreMapFolder = toolchainPath;
+        // If SourceRepositoryPath is in the toolchain config use this for core folder instead of default toolchain
+        if (tcc.SourceRepositoryPath != null) {
+            coreMapFolder = tcc.SourceRepositoryPath;
+        }
+        this._coreMapFolder = path.join(coreMapFolder, 'core');
+
+        if (fileExists(this._coreMapFolder))
+            this._projectFolderMaps["core"] = path.dirname(this._coreMapFolder)
+
     }
 
     private initIdString(projectData : any): void {
