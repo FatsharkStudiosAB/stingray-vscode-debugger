@@ -7,6 +7,7 @@
 import * as vscode from 'vscode';
 import * as commands from './commands';
 import * as autocomplete from './autocomplete'
+import { DebugSession } from 'vscode-debugadapter';
 
 const initialConfigurations = {
     version: '0.2.0',
@@ -42,5 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-    // nothing to do
+    const session = vscode.debug.activeDebugSession;
+    session.customRequest('dshsa');
 }
+

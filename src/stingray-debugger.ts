@@ -346,8 +346,8 @@ class StingrayDebugSession extends DebugSession {
      * Lets close engine connection and finish session.
      */
     protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments): void {
-        this._conn.sendDebuggerCommand('set_breakpoints', {breakpoints: {}});
-        this._conn.sendDebuggerCommand('continue');
+
+        this.shutdown();
         // Close the engine connection
         this._conn.close();
         this._conn = null;
@@ -785,6 +785,17 @@ class StingrayDebugSession extends DebugSession {
         this._conn = null;
     }
 
+    public shutdown(): void {
+        this._conn.sendDebuggerCommand('set_breakpoints', {breakpoints: {}});
+        this._conn.sendDebuggerCommand('continue');
+        setTimeout(() => {
+            process.exit(0);
+        }, 100);
+	}
+
+    protected customRequest(command: string, response: DebugProtocol.Response, args: any): void {
+		this.shutdown();
+	}
     //---- Implementation
 
     private getResourceFilePath (source) {

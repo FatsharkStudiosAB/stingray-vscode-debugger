@@ -1,4 +1,7 @@
-## 1.1.2
+## 1.1.4
+* Specifying ports for launch configs now allow users to debug multiple instances of the game at the same time
+
+## 1.1.3
 * Clear breakpoints and continue on disconnecting from an attached debug target
 
 ## 1.1.2
