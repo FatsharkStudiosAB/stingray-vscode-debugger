@@ -1,3 +1,6 @@
+## 1.1.6
+* Fixed an edge-case where the debugger would get stuck.
+
 ## 1.1.5
 * Script project and mapped folder directory mapping now taken from toolchain instead of relying on finding project and mapped folder specific files like .asset_server_directory etc.
 

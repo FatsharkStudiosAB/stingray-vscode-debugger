@@ -352,28 +352,36 @@ class StingrayDebugSession extends DebugSession {
      * Handle client breakpoints.
      */
     protected setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): void {
-
         let filePath = args.source.path;
         let clientLines = args.lines;
         let validScript = true;
 
         // Find resource root looking for settings.ini or .stingray-asset-server-directory
         let resourcePath = filePath;
-        let dirPath = path.dirname(filePath).replace(/^[\/\\]|[\/\\]$/g, '');
-        while (true) {
 
+        // Uppercase the paths so we do case insensitive comparison in the while loop
+        let projectMapFolder = this._projectMapFolder.toUpperCase()
+        let coreMapFolder = this._coreMapFolder.toUpperCase()
+        let dirPath = path.dirname(filePath).replace(/^[\/\\]|[\/\\]$/g, '').toUpperCase();
+
+        while (true) {
             // Check that we have a valid script folder or that we did not reach the drive root.
-            if (!dirPath || dirPath === filePath || dirPath === '.') {
+            if (!dirPath || dirPath == filePath || dirPath === '.') {
                 validScript = false;
                 break;
             }
 
-            if (dirPath == this._projectMapFolder) {
+            if (dirPath == path.dirname(dirPath)) {
+                validScript = false;
+                break;
+            }
+
+            if (dirPath == projectMapFolder) {
                 resourcePath = path.relative(this._projectMapFolder, filePath);
                 break;
             }
 
-            if (dirPath == this._coreMapFolder) {
+            if (dirPath == coreMapFolder) {
                 resourcePath = path.join('core', path.relative(this._coreMapFolder, filePath));
                 break;
             }
