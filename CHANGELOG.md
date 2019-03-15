@@ -4,7 +4,7 @@
 ## 1.1.7
 * Fixed an edge-case where the debugger would get stuck.
 
-## 1.1.7
+## 1.1.6
 * Extension now includes another extension to allow launching of debugging sessions from url.
 
 ## 1.1.5
