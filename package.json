@@ -1,7 +1,7 @@
 {
     "name": "fatshark-debug",
     "displayName": "Fatshark Debugger",
-    "version": "1.1.6",
+    "version": "1.1.8",
     "description": "Extension to debug Fatshark applications and games.",
     "license": "MIT",
     "author": {
@@ -65,6 +65,9 @@
         "onLanguage:lua",
         "workspaceContains:spm-packages.sjson"
     ],
+    "extensionPack": [
+		"fabiospampinato.vscode-debug-launcher"
+	],
     "contributes": {
         "configuration": {
             "type": "object",

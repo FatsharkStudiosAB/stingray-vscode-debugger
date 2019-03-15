@@ -1,5 +1,11 @@
-## 1.1.6
+## 1.1.8
+* Added fatshark specific lua api code complete.
+
+## 1.1.7
 * Fixed an edge-case where the debugger would get stuck.
+
+## 1.1.7
+* Extension now includes another extension to allow launching of debugging sessions from url.
 
 ## 1.1.5
 * Script project and mapped folder directory mapping now taken from toolchain instead of relying on finding project and mapped folder specific files like .asset_server_directory etc.
