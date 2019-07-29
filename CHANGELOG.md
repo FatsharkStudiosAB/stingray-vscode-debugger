@@ -1,3 +1,6 @@
+## 1.1.9
+* Updated lua api code completion with changes in adoc.
+
 ## 1.1.8
 * Added fatshark specific lua api code complete.
 
