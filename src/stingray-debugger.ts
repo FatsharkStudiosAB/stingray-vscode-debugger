@@ -468,8 +468,9 @@ class StingrayDebugSession extends DebugSession {
         if (!this._callstack)
             return this.sendErrorResponse(response, 1000, "No callstack available");
 
-        this._scopesContent.clear();
-        this._topLevelScopes.length = 0;
+        // Bug Fix: The function scopeRequest runs only once when selecting a different stack. If has already run previously, it won't run anymore, so the content will be overritten
+        //this._scopesContent.clear();
+        //this._topLevelScopes.length = 0;
 
         const scopes = new Array<Scope>();
         const scopeDescs = {
