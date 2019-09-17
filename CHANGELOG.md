@@ -1,3 +1,6 @@
+## 1.1.10
+* Fixed bug with expanding table.
+
 ## 1.1.9
 * Updated lua api code completion with changes in adoc.
 
