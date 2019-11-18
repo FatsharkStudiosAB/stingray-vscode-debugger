@@ -25,7 +25,7 @@ export function findFiles (startPath, filter, recurse = false, items = []) {
 };
 
 export function isPotentialIdentifier (str: string) {
-    const format = /[&*()+\-=\[\]{}':"\\|,\/]/;
+    const format = /[&*()+\-=\[\]{}':\\|,\/]/;
     return !format.test(str);
 }
 

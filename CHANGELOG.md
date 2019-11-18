@@ -1,3 +1,9 @@
+## 1.1.12
+* Fixed bug with evaluate_script_expression when hovering strings.
+
+## 1.1.11
+* Fixed bug with expanding table (Same version as 1.1.10)
+
 ## 1.1.10
 * Fixed bug with expanding table.
 
