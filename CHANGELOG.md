@@ -1,3 +1,6 @@
+## 1.1.13
+* Removed console debug prints
+
 ## 1.1.12
 * Fixed bug with evaluate_script_expression when hovering strings.
 
