@@ -270,7 +270,13 @@ class LuaSignatureProvider implements vscode.SignatureHelpProvider {
 
 const LUA_MODE: vscode.DocumentFilter = { language: 'lua', scheme: 'file' };
 export function initialize(context: vscode.ExtensionContext) {
-    let apiDoc = path.join(context.extensionPath, 'res', 'lua_api_stingray3d.json');
+    const config = vscode.workspace.getConfiguration('stingray')
+    let toolchain = config.get('toolchainproject').toString();
+    let toolchainPath = process.env.BsBinariesDir;
+    if (toolchainPath == null)
+        toolchainPath = "C:/BitSquidBinaries";
+    let apiDoc = path.join(toolchainPath, toolchain, 'tools_external', 'lua_api_stingray3d.json');
+
     adoc = new Adoc(apiDoc);
 
     context.subscriptions.push(

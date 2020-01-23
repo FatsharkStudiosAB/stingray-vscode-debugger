@@ -1,3 +1,7 @@
+## 1.1.14
+* Fixed issue when inserting multiple elements with the same name in a table.
+* Moved autocomplete source path to be taken from local binaries directory.
+
 ## 1.1.13
 * Removed console debug prints
 

@@ -1045,14 +1045,23 @@ class StingrayDebugSession extends DebugSession {
 
     private populateVariables(scope: ScopeContent, stingrayTableValues: Array<any>) : void {
         const variables = [];
+        let duplicatesCounter = 0;
         for (let i = 0; i < stingrayTableValues.length; ++i) {
             let tableValue = stingrayTableValues[i];
             let varName = tableValue.var_name || tableValue.key;
-            if (varName === "(*temporary)")
-                continue;
+            if (varName === "(*temporary)"){
+                continue;}
             if (tableValue.value === "C function")
                 continue;
 
+            // Add (n) at the end of a element in the table if one with the same name is already inserted
+            if(tableValue.key){
+                variables.forEach(element => {
+                    if(element.name === tableValue.key){
+                        varName = varName + "(" + ++duplicatesCounter + ")";
+                    }
+                });
+            }
             let displayName = tableValue.key;
             let value = tableValue.value;
             let type = tableValue.type;
