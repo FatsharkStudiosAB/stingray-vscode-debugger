@@ -72,17 +72,20 @@
         "configuration": {
             "type": "object",
             "title": "Stingray configuration",
-            "properties": {
-                "stingray.toolchain": {
-                    "type": "string",
-                    "default": "${env.BsBinariesDir}",
-                    "description": "Fatshark toolchain sync folder, e.g. C:/BitsquidBinaries/"
-                },
-                "stingray.toolchainproject": {
-                    "type": "string",
-                    "default": "",
-                    "description": "Fatshark toolchain project folder inside the toolchain sync folder"
-                }
+			"properties": {
+				"stingray.toolchain": {
+					"type": "string",
+					"scope": "application",
+					"default": "${env.BsBinariesDir}",
+					"description": "Fatshark toolchain sync folder, e.g. C:/BitsquidBinaries/"
+				},
+				"stingray.toolchainproject": {
+					"type": "string",
+					"scope": "resource",
+					"default": "",
+					"description": "Fatshark toolchain project folder inside the toolchain sync folder"
+				}
+			}
             }
         },
         "commands": [
