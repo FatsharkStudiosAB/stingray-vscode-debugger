@@ -1,3 +1,6 @@
+## 1.1.15
+* Fixed issue with settings levels so that project toolchain can be pulled from vscode workspace and folder settings
+
 ## 1.1.14
 * Fixed issue when inserting multiple elements with the same name in a table.
 * Moved autocomplete source path to be taken from local binaries directory.
