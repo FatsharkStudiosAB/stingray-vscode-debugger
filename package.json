@@ -85,7 +85,6 @@
 					"default": "",
 					"description": "Fatshark toolchain project folder inside the toolchain sync folder"
 				}
-			}
             }
         },
         "commands": [
