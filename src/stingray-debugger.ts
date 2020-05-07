@@ -568,7 +568,7 @@ class StingrayDebugSession extends DebugSession {
             }
         } else if (args.context === 'hover') {
             let luaValueExpression = args.expression.replace(':', '.');
-            this.evaluateExpression(response, luaValueExpression);
+            this.evaluateIdentifierResult(response, luaValueExpression);
         } else if (args.context === 'watch') {
             this.evaluateExpression(response, args.expression);
         }
@@ -905,6 +905,8 @@ class StingrayDebugSession extends DebugSession {
     }
 
 
+
+
     /**
      *Evaluate a Lua expression. If the expression appears to be an identifier, we dig into the scope chain to
      properly populate the response with a variablesReference.
@@ -915,7 +917,15 @@ class StingrayDebugSession extends DebugSession {
         if (!helpers.isPotentialIdentifier(expression)) {
             return this.evaluateLuaSnippet(response, expression);
         }
+        return this.evaluateIdentifierResult(response, expression);
+    }
 
+    /**
+     * Evaluate identifier result
+     * @param response
+     * @param expression
+     */
+    private evaluateIdentifierResult(response: DebugProtocol.EvaluateResponse, expression: string) {
         this.getIdentifierInfo(expression).then(result => {
             if (!result) {
                 return this.evaluateLuaSnippet(response, expression);

@@ -1,3 +1,6 @@
+## 1.1.16
+* Fixed crash when hovering expression that includes '*'.
+
 ## 1.1.15
 * Fixed issue with settings levels so that project toolchain can be pulled from vscode workspace and folder settings
 
