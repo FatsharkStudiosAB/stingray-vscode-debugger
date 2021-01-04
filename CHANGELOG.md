@@ -1,3 +1,6 @@
+## 1.1.17
+* Expanded toolchain parameter functionality to not be explicitly bound to a subdirectory of BsBinariesDir or c:/BitSquidBinaries
+
 ## 1.1.16
 * Fixed crash when hovering expression that includes '*'.
 

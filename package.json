@@ -1,7 +1,7 @@
 {
     "name": "fatshark-debug",
     "displayName": "Fatshark Debugger",
-    "version": "1.1.16",
+    "version": "1.1.17",
     "description": "Extension to debug Fatshark applications and games.",
     "license": "MIT",
     "author": {
@@ -233,7 +233,7 @@
                         "properties": {
                             "toolchain": {
                                 "type": "string",
-                                "description": "The name of your toolchain inside the BsBinaries path. so a project name of Project would result in a toolchain path of C:/BitsquidBinaries/Project"
+                                "description": "Either the full directory where your toolchain resides (e.g. c:/project/mytoolchain), *or* the name of your Project toolchain inside the BsBinariesDir path (so a project name of 'Project' would result in a default toolchain path of C:/BitsquidBinaries/Project)"
                             },
                             "port": {
                                 "type": "number",
@@ -269,7 +269,7 @@
                             },
                             "toolchain": {
                                 "type": "string",
-                                "description": "The name of your toolchain inside the BsBinaries path. so a project name of Project would result in a toolchain path of C:/BitsquidBinaries/Project"
+                                "description": "Either the full directory where your toolchain resides (e.g. c:/project/mytoolchain), *or* the name of your toolchain inside the BsBinariesDir path (so a project name of 'Project' would result in a default toolchain path of C:/BitsquidBinaries/Project)"
                             }
                         }
                     }
