@@ -263,18 +263,65 @@ class StingrayDebugSession extends DebugSession {
     }
 
     /**
+    * Resolves the toolchain location, and checks to see if it is valid
+    * @param toolChainParameter toolchain parameter supplied during launch, either a full directory or a partial one (with extra support for empty case)
+    * @returns toolchain location, or null if non-existent or invalid
+    */
+    protected getToolchainPath(toolChainParameter: string): string {
+        let debugging = false // local debugging flag for testing, in case anyone needs to be in here again
+
+        // we again expect a full toolchain directory instead of a single subdirectory name here...
+        let toolchainPath = toolChainParameter;
+        // ... and if there's absolutely _nothing_, we try to default to SR_BIN_DIR
+        if (toolchainPath == null)
+        {
+            this.sendEvent(new OutputEvent("?> Toolchain parameter is empty. Defaulting to SR_BIN_DIR environment variable.\r\n"));
+            toolchainPath = process.env.SR_BIN_DIR;
+            if (toolchainPath == null)
+            {
+                this.sendEvent(new OutputEvent("!!! Aborting: SR_BIN_DIR environment variable undefined!\r\n"));
+                return toolchainPath;
+            }
+        }
+
+        // if we still have an old style single subdir, follow the old path
+        if (toolchainPath.indexOf(':') == -1)
+        {
+            if (debugging) this.sendEvent(new OutputEvent("i> Toolchain parameter doesn't look like a full path. Using legacy codepath.\r\n"));
+
+            let toolchainStub = process.env.BsBinariesDir;
+            if (toolchainStub == null)
+            {
+                this.sendEvent(new OutputEvent("!> BsBinariesDir environment variable not set. Defaulting to c:/BitSquidBinaries.\r\n"));
+                toolchainStub = "C:/BitSquidBinaries";
+            }
+            toolchainPath = path.join(toolchainStub, toolChainParameter);
+        }
+
+        if (debugging) this.sendEvent(new OutputEvent(`i> Checking to see if ${toolchainPath} exists and is a valid Stingray toolchain directory.\r\n`));
+
+        // if the directory or the required project definition file doesn't exist, make us abort in the calling function
+        if (!fileExists(toolchainPath) || !fileExists(path.join(toolchainPath,"settings","ToolChainConfiguration.config")))
+        {
+            this.sendEvent(new OutputEvent(`!!! Aborting: Couldn't find toolchain directory ${toolchainPath} or required ToolChainConfiguration.config file!\r\n`));
+            toolchainPath = null;
+        }
+        else
+            if (debugging) this.sendEvent(new OutputEvent(`i> Directory and ToolChainConfiguration.config file both exist! We should be good.\r\n`));
+
+        return toolchainPath;
+    }
+
+    /**
      * Launch the engine and then attach to it.
      */
     protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
         let engineExe = args.engine_exe;
         let engine_port = args.port;
-        let toolchain = args.toolchain;
 
-        let toolchainPath = process.env.BsBinariesDir;
-        if (toolchainPath == null )
-            toolchainPath = "C:/BitSquidBinaries";
-
-        toolchainPath = path.join(toolchainPath,toolchain);
+        let toolchainPath = this.getToolchainPath(args.toolchain);
+        if (toolchainPath == null)
+            return;
 
         // Launch engine
         let launcher = new EngineLauncher({
@@ -303,13 +350,11 @@ class StingrayDebugSession extends DebugSession {
     protected attachRequest(response: DebugProtocol.AttachResponse, args: AttachRequestArguments): void {
         var ip = args.ip;
         var port = args.port;
-        let toolchain = args.toolchain;
 
-        let toolchainPath = process.env.BsBinariesDir;
-        if (toolchainPath == null )
-            toolchainPath = "C:/BitSquidBinaries";
+        let toolchainPath = this.getToolchainPath(args.toolchain);
+        if (toolchainPath == null)
+            return;
 
-        toolchainPath = path.join(toolchainPath, toolchain);
         //Initiate project paths and id string lookup
         this.initProjectPaths(toolchainPath);
         // Establish web socket connection with engine.
